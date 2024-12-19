@@ -457,7 +457,7 @@ class timetask(Plugin):
         if reply_text is None or len(reply_text) <= 0:
             #标题
             if self.conf.get("is_need_title_whenNormalReply", True):
-                reply_text += f"⏰叮铃铃，定时任务时间已到啦~\n"
+                reply_text += f"⏰叮铃铃，卓工小智提醒您~\n"
             #时间
             if self.conf.get("is_need_currentTime_whenNormalReply", True):
                 # 获取当前时间
@@ -469,10 +469,10 @@ class timetask(Plugin):
                 reply_text += f"【当前时间】：{formatted_time}\n"
             #任务标识
             if self.conf.get("is_need_identifier_whenNormalReply", True):
-                reply_text += f"【任务编号】：{model.taskId}\n"
+                reply_text += f"【课程编号】：{model.taskId}\n"
             #内容描述
             if self.conf.get("is_need_detailDeccription_whenNormalReply", True):
-                reply_text += f"【任务详情】："
+                reply_text += f"【内容详情】："
 
             reply_text += eventStr
             replyType = ReplyType.TEXT
