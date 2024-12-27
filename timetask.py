@@ -78,10 +78,10 @@ class timetask(Plugin):
     #处理时间任务
     def deal_timeTask(self, content, e_context: EventContext):
         
-        if content.startswith("取消任务"):
+        if content.startswith("取消课程"):
             self.cancel_timeTask(content, e_context)
             
-        elif content.startswith("任务列表"):
+        elif content.startswith("课程列表"):
             self.get_timeTaskList(content, e_context)
             
         else:
@@ -105,10 +105,10 @@ class timetask(Plugin):
         #文案
         if isExist:
             tempStr = self.get_default_remind(TimeTaskRemindType.Cancel_Success)
-            reply_text = "⏰定时任务，取消成功~\n" + "【任务编号】：" + taskId + "\n" + "【任务详情】：" + taskContent
+            reply_text = "⏰定时课程，取消成功~\n" + "【任务编号】：" + taskId + "\n" + "【任务详情】：" + taskContent
         else:
             tempStr = self.get_default_remind(TimeTaskRemindType.Cancel_Failed)
-            reply_text = "⏰定时任务，取消失败😭，未找到任务编号，请核查\n" + "【任务编号】：" + taskId
+            reply_text = "⏰定时课程，取消失败😭，未找到课程编号，请核查\n" + "【任务编号】：" + taskId
         
         #拼接提示
         reply_text = reply_text + tempStr
@@ -140,10 +140,10 @@ class timetask(Plugin):
         tempStr = ""
         if len(tempArray) <= 0:
             tempStr = self.get_default_remind(TimeTaskRemindType.NO_Task)
-            reply_text = "⏰当前无待执行的任务列表"
+            reply_text = "⏰当前无待执行的课程列表"
         else:
             tempStr = self.get_default_remind(TimeTaskRemindType.TaskList_Success)
-            reply_text = "⏰定时任务列表如下：\n\n"
+            reply_text = "⏰定时课程列表如下：\n\n"
             #根据时间排序
             sorted_times = sorted(tempArray, key=lambda x: self.custom_sort(x.timeStr))
             for model in sorted_times:
@@ -165,7 +165,7 @@ class timetask(Plugin):
     #添加任务
     def add_timeTask(self, content, e_context: EventContext):
         #失败时，默认提示
-        defaultErrorMsg = "⏰定时任务指令格式异常😭，请核查！" + self.get_default_remind(TimeTaskRemindType.Add_Failed)
+        defaultErrorMsg = "⏰定时课程指令格式异常😭，请核查！" + self.get_default_remind(TimeTaskRemindType.Add_Failed)
         
         #周期、时间、事件
         circleStr, timeStr, eventStr = self.get_timeInfo(content)
@@ -210,7 +210,7 @@ class timetask(Plugin):
                 channel_name = RobotConfig.conf().get("channel_type", "wx")
                 groupId = taskModel.get_gropID_withGroupTitle(groupTitle , channel_name)
                 if len(groupId) <= 0:
-                    defaultErrorMsg = f"⏰定时任务指令格式异常😭，未找到群名为【{groupTitle}】的群聊，请核查！" + self.get_default_remind(TimeTaskRemindType.Add_Failed)
+                    defaultErrorMsg = f"⏰定时课程指令格式异常😭，未找到群名为【{groupTitle}】的群聊，请核查！" + self.get_default_remind(TimeTaskRemindType.Add_Failed)
                     self.replay_use_default(defaultErrorMsg, e_context)
                     return
         
@@ -226,10 +226,10 @@ class timetask(Plugin):
                 taskStr = f"{circleStr} {taskModel.eventStr}"
             else:
                 taskStr = f"{circleStr} {timeStr} {taskModel.eventStr}"
-            reply_text = f"恭喜你，⏰定时任务已创建成功🎉~\n【任务编号】：{taskId}\n【任务详情】：{taskStr}"
+            reply_text = f"恭喜你，⏰定时课程已创建成功🎉~\n【课程编号】：{taskId}\n【内容详情】：{taskStr}"
         else:
             tempStr = self.get_default_remind(TimeTaskRemindType.Add_Failed)
-            reply_text = f"sorry，⏰定时任务创建失败😭"
+            reply_text = f"sorry，⏰定时课程创建失败😭"
             
         #拼接提示
         reply_text = reply_text + tempStr
@@ -557,27 +557,27 @@ class timetask(Plugin):
         # 指令前缀
         command_prefix = self.conf.get("command_prefix", "$time")
 
-        h_str = "🎉功能一：添加定时任务\n"
+        h_str = "🎉功能一：添加课程提醒\n"
         codeStr = f"【指令】：{command_prefix} 周期 时间 事件\n"
         circleStr = "【周期】：今天、明天、后天、每天、工作日、每周X（如：每周三）、YYYY-MM-DD的日期、cron表达式\n"
         timeStr = "【时间】：X点X分（如：十点十分）、HH:mm:ss的时间\n"
         enventStr = "【事件】：早报、点歌、搜索、GPT、文案提醒（如：提醒我健身）\n"
-        exampleStr = f"\n👉提醒任务：{command_prefix} 今天 10:00 提醒我健身\n" + f"👉cron任务：{command_prefix} cron[0 * * * *] 准点报时" + "\n"
+        exampleStr = f"\n👉提醒课程：{command_prefix} 今天 10:00 提醒我上课\n" + f"👉cron任务：{command_prefix} cron[0 * * * *] 准点报时" + "\n"
         exampleStr += f"👉定群任务：{command_prefix} 今天 10:00 提醒我健身 group[群标题]" + "\n"
         exampleStr0 = f"👉GPT任务：{command_prefix} 今天 10:00 GPT 夸夸我\n\n\n"
         tempStr = h_str + codeStr + circleStr + timeStr + enventStr + exampleStr + exampleStr0
         
         h_str1 = "🎉功能二：取消定时任务\n"
-        codeStr1 = f"【指令】：{command_prefix} 取消任务 任务编号\n"
-        taskId1 = "【任务编号】：任务编号（添加任务成功时，机器人回复中有）\n"
-        exampleStr1 = f"\n👉示例：{command_prefix} 取消任务 urwOi0he\n\n\n"
+        codeStr1 = f"【指令】：{command_prefix} 取消提醒 课程编号\n"
+        taskId1 = "【课程编号】：课程编号（添加课程成功时，机器人回复中有）\n"
+        exampleStr1 = f"\n👉示例：{command_prefix} 取消课程 urwOi0he\n\n\n"
         tempStr1 = h_str1 + codeStr1 + taskId1 + exampleStr1
         
-        h_str2 = "🎉功能三：获取任务列表\n"
-        codeStr2 = f"【指令】：{command_prefix} 任务列表\n"
-        exampleStr2 = f"\n👉示例：{command_prefix} 任务列表\n\n\n"
+        h_str2 = "🎉功能三：获取课程列表\n"
+        codeStr2 = f"【指令】：{command_prefix} 课程列表\n"
+        exampleStr2 = f"\n👉示例：{command_prefix} 课程列表\n\n\n"
         tempStr2 = h_str2 + codeStr2 + exampleStr2
         
-        headStr = "📌 功能介绍：添加定时任务、取消定时任务、获取任务列表。\n\n"
+        headStr = "📌 功能介绍：添加定时课程、取消定时课程、获取课程列表。\n\n"
         help_text = headStr + tempStr + tempStr1 + tempStr2
         return help_text
